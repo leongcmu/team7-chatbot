@@ -1,7 +1,5 @@
 # Eduling Assistant — VS Code / FastAPI handoff starter
 
-> **Confidentiality:** Client identity and branding require permission before publication in a public repository. Keep this repository private until approved.
-
 ## Purpose
 A lightweight Gemini/LangChain **tool-calling agent** with six client-specific tools, deterministic commercial actions, curated Eduling content, and a FastAPI contract for the team's frontend. Built from the team's midpoint notebook. This is a **prototype**, not a security-audited production deployment.
 
