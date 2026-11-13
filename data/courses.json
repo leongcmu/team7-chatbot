@@ -1,0 +1,32 @@
+[
+  {
+    "id": "course_overview",
+    "category": "course_overview",
+    "name": "Eduling course catalog overview",
+    "alternate_phrasings": [
+      "What courses are offered?",
+      "List all courses",
+      "What can I study?",
+      "What languages can I learn?",
+      "How many languages does Eduling support?"
+    ],
+    "description": "Eduling's public catalog groups its offerings into test preparation, teacher development, courses for specific purposes, and general English. The website currently advertises 20+ courses and 50+ target languages for EdulingAI practice. A newer Eduling article mentions 144 target-language varieties; the team should confirm the preferred public claim with the client before deployment.",
+    "source_url": "https://www.eduling.ai/post/course-catalog-in-eduling-speak",
+    "status": "approved_with_note",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "course_differences",
+    "category": "course_overview",
+    "name": "Differences among Eduling courses",
+    "alternate_phrasings": [
+      "What is the difference between the courses?",
+      "How are Eduling courses different?",
+      "Which type of course should I choose?"
+    ],
+    "description": "Test-preparation courses focus on exam formats, strategies, and practice. General English courses build communication and vocabulary. Pronunciation and special-purpose courses focus on particular skills or goals. Teacher-development courses provide educators with techniques, resources, and professional learning.",
+    "source_url": "https://www.eduling.ai/post/course-catalog-in-eduling-speak",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  }
+]

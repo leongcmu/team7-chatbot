@@ -1,0 +1,177 @@
+[
+  {
+    "id": "company_what_is_eduling",
+    "category": "company",
+    "question": "What is Eduling?",
+    "alternate_phrasings": [
+      "Tell me about Eduling",
+      "What does Eduling do?",
+      "How does Eduling work?",
+      "What kind of platform is Eduling?"
+    ],
+    "answer": "Eduling is a task-based, AI-powered language-learning and teaching platform. Learners complete meaningful activities and can practice speaking, listening, reading, writing, pronunciation, and vocabulary with support from EdulingAI.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "company_history",
+    "category": "company",
+    "question": "When was Eduling created?",
+    "alternate_phrasings": [
+      "When was Eduling founded?",
+      "How old is Eduling?",
+      "What year did Eduling start?"
+    ],
+    "answer": "Eduling was created in 2019.",
+    "source_url": "https://www.eduling.ai/about",
+    "status": "pending_client_verification",
+    "last_verified": null
+  },
+  {
+    "id": "audience_who_benefits",
+    "category": "audience",
+    "question": "Who benefits from Eduling?",
+    "alternate_phrasings": [
+      "Who is Eduling for?",
+      "Can teachers use Eduling?",
+      "Is Eduling only for students?",
+      "Who should use Eduling?"
+    ],
+    "answer": "Eduling supports language learners with goals such as everyday communication, test preparation, writing, and pronunciation. It also supports teachers and schools through educator tools and professional-development courses.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "benefits_why_use",
+    "category": "features",
+    "question": "Why should I use Eduling?",
+    "alternate_phrasings": [
+      "What makes Eduling different?",
+      "Why choose Eduling?",
+      "What are the benefits of Eduling?"
+    ],
+    "answer": "Eduling emphasizes task-based learning rather than rote memorization. Learners practice through meaningful interactive activities and can receive AI-supported feedback on speaking and writing.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "features_ai_learning",
+    "category": "features",
+    "question": "How is AI used to help me learn?",
+    "alternate_phrasings": [
+      "What does EdulingAI do?",
+      "How does the AI tutor work?",
+      "Can the AI correct my speaking?",
+      "Does Eduling give AI feedback?"
+    ],
+    "answer": "EdulingAI supports interactive tasks and conversations and can provide feedback and corrections. Eduling also describes AI feedback and analysis for speaking and writing activities.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "pricing_premium",
+    "category": "pricing",
+    "question": "Is Eduling free and how much does premium cost?",
+    "alternate_phrasings": [
+      "How much is Eduling?",
+      "What does premium cost?",
+      "Is there a free version?",
+      "What are Eduling's prices?"
+    ],
+    "answer": "The current public one-year premium page lists a sale price of $64.99. Plans and prices may change, so visitors should verify the current offer on the official pricing page or contact Eduling.",
+    "source_url": "https://www.eduling.ai/product-page/eduling-one-year-premium",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "educators_dashboard",
+    "category": "educators",
+    "question": "Can I use Eduling with my class or school?",
+    "alternate_phrasings": [
+      "I am a teacher",
+      "Does Eduling have classroom tools?",
+      "Can teachers assign tasks?",
+      "Can my school use Eduling?"
+    ],
+    "answer": "The Eduling Educator Dashboard lets teachers create classes, add students, assign tasks, and review student work and AI feedback. Schools can contact info@eduling.org for more information and a demo.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "support_contact",
+    "category": "support",
+    "question": "How can I contact the Eduling team?",
+    "alternate_phrasings": [
+      "I need a real person",
+      "What is Eduling's email?",
+      "How do I contact support?",
+      "Can I work with a real teacher?"
+    ],
+    "answer": "For questions or assistance, email info@eduling.org or use the contact route on the Eduling website.",
+    "source_url": "https://www.eduling.ai/contact",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "tests_ielts_toefl",
+    "category": "courses",
+    "question": "Can Eduling help me prepare for IELTS or TOEFL?",
+    "alternate_phrasings": [
+      "Does Eduling have IELTS courses?",
+      "Can I practice TOEFL?",
+      "Test preparation courses",
+      "Help with IELTS speaking"
+    ],
+    "answer": "Yes. Eduling's public catalog includes IELTS speaking and writing courses and a TOEFL Speaking course, along with other test-preparation offerings.",
+    "available_offerings": [
+      "IELTS speaking",
+      "IELTS writing",
+      "TOEFL speaking"
+    ],
+    "unavailable_offerings": [],
+    "source_url": "https://www.eduling.ai/post/course-catalog-in-eduling-speak",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "getting_started_apps",
+    "category": "getting_started",
+    "question": "How do I get started and is there a mobile app?",
+    "alternate_phrasings": [
+      "Where do I sign up?",
+      "Does Eduling have an app?",
+      "How can I create an account?",
+      "Where can I download Eduling?"
+    ],
+    "answer": "You can create an account through app.eduling.ai. Eduling is also available through mobile app links provided on the official website.",
+    "source_url": "https://www.eduling.ai/",
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  },
+  {
+    "id": "social_media",
+    "category": "company",
+    "question": "How can I learn more about Eduling on social media?",
+    "alternate_phrasings": [
+      "Does Eduling have social media?",
+      "Eduling Instagram",
+      "Eduling LinkedIn",
+      "Where can I follow Eduling?"
+    ],
+    "answer": "You can follow Eduling on YouTube, LinkedIn, Instagram, and Facebook. Use the official links returned with this answer.",
+    "source_url": "https://www.eduling.ai/",
+    "additional_links": {
+      "YouTube": "https://www.youtube.com/@eduling",
+      "LinkedIn": "https://www.linkedin.com/company/eduling/home/",
+      "Instagram": "https://www.instagram.com/edulingusa/",
+      "Facebook": "https://www.facebook.com/edulingusa"
+    },
+    "status": "approved",
+    "last_verified": "2026-11-05"
+  }
+]
