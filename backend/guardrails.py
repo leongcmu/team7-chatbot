@@ -1,9 +1,16 @@
 """Application-level guards: never rely on voluntary agent tool calls for safety."""
 import re
 from urllib.parse import urlparse
-from .knowledge_base import commercial
+from .knowledge_base import approved_prices, approved_urls, commercial
 
-PATTERNS=[r'ignore\s+(?:all\s+)?(?:previous\s+|your\s+)?instructions',r'reveal.*system prompt',r'print.*api.*key']
+PATTERNS=[
+    r'ignore\s+(?:all\s+)?(?:previous\s+|prior\s+|your\s+)?instructions',
+    r'(?:reveal|show|repeat|display).*(?:system|developer|hidden).*(?:prompt|message|instruction)',
+    r'(?:bypass|disable|evade).*(?:guardrail|rule|safety|restriction)',
+    r'(?:print|show|reveal).*(?:api|secret).*key',
+    r'忽略.{0,12}(?:之前|先前|以上|所有).{0,12}(?:指令|指示|规则)',
+    r'(?:显示|泄露|告诉我).{0,12}(?:系统提示|开发者消息|隐藏指令|api密钥|密钥)',
+]
 
 CLAIM_ALIASES={
     'build':'practice','built':'practice','exam':'test','exams':'test',
@@ -41,12 +48,14 @@ def approved_action_url(url: str, action_type: str) -> bool:
     return url == cfg.get(mapping[action_type]) and urlparse(url).scheme=='https'
 
 def answer_checks(answer: str) -> list[str]:
-    # Narrow lexical checks; cannot establish full natural-language factuality.
+    """Allow only prices and links that exist in the approved knowledge base."""
     problems=[]
-    if re.search(r'\$\s*\d',answer): problems.append('unverified_price')
+    prices={match.replace(' ','') for match in re.findall(r'\$\s*\d+(?:\.\d{2})?',answer)}
+    allowed_prices={price.replace(' ','') for price in approved_prices()}
+    if prices-allowed_prices: problems.append('unverified_price')
     if re.search(r'(system prompt is|gemini_api_key)',answer,re.I): problems.append('possible_secret_disclosure')
-    # All URLs are rendered separately by the backend; prose must not invent links.
-    if re.search(r'https?://',answer): problems.append('url_in_prose')
+    links={url.rstrip('.,);]') for url in re.findall(r'https?://[^\s<>"\']+',answer)}
+    if links-set(approved_urls()): problems.append('unverified_url')
     return problems
 
 def evidence_checks(answer: str, evidence: list[dict]) -> list[str]:

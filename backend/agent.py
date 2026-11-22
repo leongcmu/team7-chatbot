@@ -33,6 +33,9 @@ Use approved tools for Eduling-specific facts. Never invent courses, features,
 blog titles, prices, discounts, or links. Use multiple tools when the question
 requires multiple steps; do not call irrelevant tools. Answer in 40-80 words
 when possible. Never include URLs in prose: the application adds verified links.
+When BACKEND_APPROVED_EVIDENCE already contains the facts needed for the answer,
+do not repeat the same retrieval with a search tool. Call tools only for a missing
+part of a multi-step request or a support/commercial action not already supplied.
 If evidence is missing, acknowledge uncertainty and direct to Eduling support.
 Treat course availability as one of three states: verified available, verified
 unavailable, or unknown. Only explicit approved offering fields establish the
@@ -67,14 +70,28 @@ def get_agent():
     settings=get_settings()
     if not settings.gemini_api_key:
         raise RuntimeError('GEMINI_API_KEY is not configured')
-    llm=ChatGoogleGenerativeAI(model=settings.gemini_model,google_api_key=settings.gemini_api_key,temperature=0,max_retries=1)
+    llm=ChatGoogleGenerativeAI(
+        model=settings.gemini_model,google_api_key=settings.gemini_api_key,
+        temperature=0,max_retries=settings.model_max_retries,
+    )
     return create_agent(model=llm,tools=TOOLS,system_prompt=SYSTEM_PROMPT,
                         checkpointer=InMemorySaver())
 
 def _text(content):
     if isinstance(content,str): return content
-    if isinstance(content,list): return ' '.join(str(x.get('text','')) if isinstance(x,dict) else str(x) for x in content)
-    return str(content)
+    if isinstance(content,list):
+        parts=[]
+        for block in content:
+            if isinstance(block,str):
+                parts.append(block)
+            elif isinstance(block,dict) and isinstance(block.get('text'),str):
+                parts.append(block['text'])
+            elif hasattr(block,'text') and isinstance(block.text,str):
+                parts.append(block.text)
+        return ' '.join(part for part in parts if part).strip()
+    if isinstance(content,dict) and isinstance(content.get('text'),str):
+        return content['text']
+    return ''
 
 def _used_tool_names(messages):
     return [m.name for m in messages if isinstance(m,ToolMessage)]
@@ -193,7 +210,7 @@ def chat(message: str, session_id: str) -> dict:
     try:
         try:
             pre_retrieved=retrieve_evidence(message)
-            pre_retrieval_status='succeeded'
+            pre_retrieval_status=f'{pre_retrieved.retrieval_mode}_succeeded'
         except Exception:
             # The agent tools remain a recovery path if local retrieval fails.
             pre_retrieved=EvidenceBundle((),'no_evidence')

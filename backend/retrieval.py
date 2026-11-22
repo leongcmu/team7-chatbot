@@ -1,10 +1,8 @@
-"""Lightweight retrieval without a local ML model or vector database.
-
-Keep this interface stable if the team later benchmarks semantic retrieval.
-"""
+"""Semantic retrieval with a lexical fallback and availability safeguards."""
 import re
 from difflib import SequenceMatcher
 from typing import Literal
+from .embeddings import embedding_search
 from .knowledge_base import approved
 
 TOKEN_ALIASES = {
@@ -14,6 +12,7 @@ TOKEN_ALIASES = {
     'offered': 'offer',
     'offers': 'offer',
     'provides': 'provide',
+    'prep': 'preparation',
 }
 TOPIC_WEIGHTS = {
     'ielts': 3.0,
@@ -23,9 +22,10 @@ TOPIC_WEIGHTS = {
 }
 AVAILABILITY_WORDS={'offer','provide','available','availability','have','has','practice'}
 COURSE_GENERIC_WORDS={
-    'a','an','and','are','can','course','does','eduling','for','i','in','is','it',
+    'a','an','and','are','can','course','do','does','eduling','for','i','in','is','it',
     'language','languages','me','of','offer','or','other','practice','program','provide',
     'the','to','we','what','whether','with','you','your','available','availability','have','has',
+    'preparation','test',
 }
 CourseAvailability=Literal['verified_available','verified_unavailable','unknown']
 
@@ -77,7 +77,7 @@ def course_availability_state(query: str, evidence: list[dict]) -> CourseAvailab
     return 'unknown'
 
 def filter_course_availability(query: str, matches: list[dict]) -> list[dict]:
-    """Remove lexical false positives from specific availability searches."""
+    """Remove false positives from specific availability searches."""
     state=course_availability_state(query,matches)
     if state is None:
         return matches
@@ -97,7 +97,8 @@ def search(query: str, items: list[dict], *, kind: str, limit: int=3,
                    item.get('summary',''),item.get('description',''),item.get('content',''),
                    item.get('answer','')]
         phrases += item.get('alternate_phrasings',[]) + item.get('topics',[])
-        score=max((similarity(query,p) for p in phrases if isinstance(p,str)),default=0)
+        scored_phrases=[(similarity(query,p),p) for p in phrases if isinstance(p,str)]
+        score,matched_text=max(scored_phrases,default=(0,''),key=lambda pair:pair[0])
         if query_topics:
             candidate_topics=set(normalize(' '.join(p for p in phrases if isinstance(p,str))).split()) & TOPIC_WEIGHTS.keys()
             matched_topics=query_topics & candidate_topics
@@ -113,6 +114,7 @@ def search(query: str, items: list[dict], *, kind: str, limit: int=3,
                             'title':item.get('title') or item.get('question') or item.get('name'),
                             'content':item.get('answer') or item.get('description') or item.get('summary') or item.get('content',''),
                             'url':item.get('source_url') or item.get('url'),
+                            'retrieval_text':matched_text,
                             'source':source or kind,
                             'status':'approved'}
             for field in ('available_offerings','unavailable_offerings'):
@@ -120,3 +122,31 @@ def search(query: str, items: list[dict], *, kind: str, limit: int=3,
                     match[field]=item[field]
             matches.append(match)
     return sorted(matches,key=lambda x:(-x['score'],x['id']))[:limit]
+
+
+def semantic_search(query: str, items: list[dict], *, kind: str, limit: int=3,
+                    min_score: float | None=None,
+                    source: str | None=None) -> list[dict]:
+    """Search a collection by embedding similarity and return approved evidence."""
+    usable={item['id']:item for item in items if approved(item)}
+    hits=embedding_search(
+        query,limit=limit,min_score=min_score,allowed_ids=set(usable),
+    )
+    if hits:
+        relative_floor=hits[0].score-0.12
+        hits=[hit for hit in hits if hit.score>=relative_floor]
+    matches=[]
+    for hit in hits:
+        item=usable[hit.record_id]
+        match={
+            'id':item['id'],'kind':kind,'score':hit.score,
+            'title':item.get('title') or item.get('question') or item.get('name'),
+            'content':item.get('answer') or item.get('description') or item.get('summary') or item.get('content',''),
+            'url':item.get('source_url') or item.get('url'),
+            'source':source or kind,'status':'approved',
+        }
+        for field in ('available_offerings','unavailable_offerings'):
+            if field in item:
+                match[field]=item[field]
+        matches.append(match)
+    return matches

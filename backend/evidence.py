@@ -1,18 +1,16 @@
-"""Backend-controlled evidence selection before agent generation.
-
-The selector reuses the lightweight lexical retriever, favors records matching
-the question's specific terms, and adds approved commercial facts without an
-extra model call.
-"""
+"""Backend-controlled semantic evidence selection before agent generation."""
 import json
+import logging
 from dataclasses import dataclass
 from typing import Literal
 
 from .actions import select_actions
-from .knowledge_base import commercial, records
+from .embeddings import EmbeddingUnavailable, embedding_search
+from .knowledge_base import approved, commercial, records
 from .retrieval import course_availability_state, normalize, search
 
 EvidenceCoverage=Literal['no_evidence','partial_evidence','sufficient_evidence']
+RetrievalMode=Literal['embedding','lexical_fallback','preferred_ids']
 MAX_CONTEXT_RECORDS=6
 MAX_CONTENT_CHARS=500
 
@@ -23,12 +21,14 @@ GENERIC_QUERY_WORDS={
 }
 BLOG_WORDS={'article','articles','blog','blogs','news','post','posts'}
 PRICE_COMPARISON_WORDS={'cheaper','lower','less','saving','savings','versus','vs'}
+logger=logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class EvidenceBundle:
     records: tuple[dict,...]
     coverage: EvidenceCoverage
+    retrieval_mode: RetrievalMode='embedding'
 
     def context(self) -> str:
         """Return bounded approved JSON for the model's structured input."""
@@ -60,7 +60,7 @@ def _meaningful_terms(question: str) -> set[str]:
 def _specificity(question_terms: set[str], item: dict) -> float:
     if not question_terms:
         return 1.0
-    text=' '.join(str(item.get(field,'')) for field in ('title','content'))
+    text=' '.join(str(item.get(field,'')) for field in ('title','content','retrieval_text'))
     item_terms=set(normalize(text).split())
     return len(question_terms & item_terms) / len(question_terms)
 
@@ -137,7 +137,7 @@ def support_evidence(reason: str='unresolved_question') -> dict:
     }
 
 
-def _knowledge_records(question: str) -> list[dict]:
+def _lexical_knowledge_records(question: str) -> list[dict]:
     candidates=[]
     candidates+=search(question,records('faqs.json'),kind='faq',limit=4,
                        min_score=0.30,source='faqs.json')
@@ -150,10 +150,33 @@ def _knowledge_records(question: str) -> list[dict]:
         current=deduplicated.get(item['id'])
         if current is None or item['score']>current['score']:
             deduplicated[item['id']]=item
-    # Exact price copy remains blocked by policy even though the legacy FAQ is
-    # approved; commercial evidence exposes only the currently verified scope.
-    safe=[item for item in deduplicated.values() if item.get('id')!='pricing_premium']
-    return _select_specific(question,safe)
+    return _select_specific(question,list(deduplicated.values()))
+
+
+def _evidence_for_ids(record_ids: list[str], scores: dict[str,float] | None=None) -> list[dict]:
+    """Resolve selected IDs against approved local records."""
+    wanted=set(record_ids[:MAX_CONTEXT_RECORDS])
+    selected=[]
+    for filename,kind in (
+        ('faqs.json','faq'),('courses.json','course'),('blog_posts.json','blog'),
+    ):
+        for item in records(filename):
+            if item.get('id') not in wanted or not approved(item):
+                continue
+            match={
+                'id':item['id'],'kind':kind,
+                'score':(scores or {}).get(item['id'],1.0),
+                'title':item.get('title') or item.get('question') or item.get('name'),
+                'content':item.get('answer') or item.get('description') or item.get('summary') or item.get('content',''),
+                'url':item.get('source_url') or item.get('url'),
+                'source':filename,'status':'approved',
+            }
+            for field in ('available_offerings','unavailable_offerings'):
+                if field in item:
+                    match[field]=item[field]
+            selected.append(match)
+    order={record_id:index for index,record_id in enumerate(record_ids)}
+    return sorted(selected,key=lambda item:order.get(item['id'],len(order)))
 
 
 def _commercial_records(question: str) -> list[dict]:
@@ -167,9 +190,23 @@ def _commercial_records(question: str) -> list[dict]:
     return selected
 
 
-def retrieve_evidence(question: str) -> EvidenceBundle:
+def retrieve_evidence(question: str, *, preferred_ids: list[str] | None=None) -> EvidenceBundle:
     """Retrieve bounded approved evidence and estimate whether it fully answers the question."""
-    knowledge=_knowledge_records(question)
+    if preferred_ids is not None:
+        knowledge=_evidence_for_ids(preferred_ids)
+        retrieval_mode='preferred_ids'
+    else:
+        try:
+            hits=embedding_search(question,limit=1)
+            knowledge=_evidence_for_ids(
+                [hit.record_id for hit in hits],
+                {hit.record_id:hit.score for hit in hits},
+            )
+            retrieval_mode='embedding'
+        except EmbeddingUnavailable as exc:
+            logger.warning('embedding_retrieval_unavailable type=%s',type(exc).__name__)
+            knowledge=_lexical_knowledge_records(question)
+            retrieval_mode='lexical_fallback'
     commercial_records=_commercial_records(question)
     knowledge_limit=max(0,MAX_CONTEXT_RECORDS-len(commercial_records))
     combined=knowledge[:knowledge_limit]+commercial_records
@@ -188,7 +225,7 @@ def retrieve_evidence(question: str) -> EvidenceBundle:
         coverage='sufficient_evidence'
     else:
         coverage='no_evidence'
-    return EvidenceBundle(tuple(combined),coverage)
+    return EvidenceBundle(tuple(combined),coverage,retrieval_mode)
 
 
 def merge_evidence(*groups: list[dict] | tuple[dict,...]) -> list[dict]:

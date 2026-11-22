@@ -288,3 +288,12 @@ def test_diagnostics_log_tools_evidence_and_latency_without_visitor_data(monkeyp
     assert 'latency_ms' in diagnostic
     assert 'visitor_private_123' not in diagnostic
     assert 'What IELTS courses are available?' not in diagnostic
+
+
+def test_text_extraction_ignores_non_text_raw_content_blocks():
+    content=[
+        {'type':'text','text':'A clean answer.'},
+        {'type':'tool_use','id':'internal','args':{'secret':'raw output'}},
+        {'type':'image','url':'https://example.invalid/internal'},
+    ]
+    assert agent._text(content)=='A clean answer.'

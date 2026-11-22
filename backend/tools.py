@@ -5,7 +5,7 @@ Tools are read-only: no purchases, accounts, or external actions are performed.
 """
 from langchain_core.tools import tool
 from .knowledge_base import records
-from .retrieval import filter_course_availability, search
+from .retrieval import filter_course_availability, semantic_search
 from .evidence import app_evidence, subscription_evidence, support_evidence
 
 @tool
@@ -15,7 +15,7 @@ def search_approved_faq(query: str) -> list[dict]:
     Use when the visitor asks how Eduling works or what features are available.
     Return ranked evidence; if empty, do not invent an answer.
     """
-    return search(query,records('faqs.json'),kind='faq',min_score=0.30,source='faqs.json')
+    return semantic_search(query,records('faqs.json'),kind='faq',source='faqs.json')
 
 @tool
 def search_course_catalog(query: str) -> list[dict]:
@@ -28,8 +28,8 @@ def search_course_catalog(query: str) -> list[dict]:
     result means availability is unknown, never that a course does not exist.
     """
     faq_courses=[item for item in records('faqs.json') if item.get('category')=='courses']
-    matches=search(query,faq_courses,kind='course',limit=3,min_score=0.30,source='faqs.json')
-    matches+=search(query,records('courses.json'),kind='course',limit=3,min_score=0.30,source='courses.json')
+    matches=semantic_search(query,faq_courses,kind='course',limit=3,source='faqs.json')
+    matches+=semantic_search(query,records('courses.json'),kind='course',limit=3,source='courses.json')
     ranked=sorted(matches,key=lambda item:(-item['score'],item['id']))
     return filter_course_availability(query,ranked)[:3]
 
@@ -41,7 +41,8 @@ def search_blog_posts(query: str) -> list[dict]:
     Return an empty list when no sufficiently relevant article is approved.
     Do not invent article titles or URLs.
     """
-    return search(query,records('blog_posts.json'),kind='blog',limit=2,min_score=0.42,source='blog_posts.json')
+    return semantic_search(query,records('blog_posts.json'),kind='blog',limit=2,
+                           min_score=0.42,source='blog_posts.json')
 
 @tool
 def get_app_download_info(reason: str='course_discovery') -> dict:

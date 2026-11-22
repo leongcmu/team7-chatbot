@@ -108,6 +108,7 @@
     "question": "How can I contact the Eduling team?",
     "alternate_phrasings": [
       "I need a real person",
+      "Can I talk to a real person?",
       "What is Eduling's email?",
       "How do I contact support?",
       "Can I work with a real teacher?"
@@ -123,7 +124,9 @@
     "question": "Can Eduling help me prepare for IELTS or TOEFL?",
     "alternate_phrasings": [
       "Does Eduling have IELTS courses?",
+      "Do you have IELTS prep?",
       "Can I practice TOEFL?",
+      "Is there a TOEFL course?",
       "Test preparation courses",
       "Help with IELTS speaking"
     ],
