@@ -1,0 +1,17 @@
+{
+  "name": "eduling-chatbot-monorepo",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @eduling/playground dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm --filter @eduling/chatbot... build && pnpm -r typecheck",
+    "test": "pnpm --filter @eduling/chatbot test"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,506 @@
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/700.css";
+.eduling-chatbot {
+  --eduling-brand: #49bfda;
+  --eduling-action: #087d94;
+  --eduling-ink: #183e48;
+  --eduling-muted: #637e85;
+  --eduling-border: #dfebee;
+  --eduling-surface: #f0f9fb;
+  --eduling-z-index: 1000;
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: var(--eduling-z-index);
+  font:
+    400 15px/22px Nunito,
+    sans-serif;
+  color: var(--eduling-ink);
+  text-align: left;
+  letter-spacing: normal;
+  color-scheme: light;
+}
+.eduling-chatbot * {
+  box-sizing: border-box;
+}
+.eduling-chatbot [hidden] {
+  display: none !important;
+}
+.eduling-chatbot button,
+.eduling-chatbot textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.eduling-chatbot button {
+  cursor: pointer;
+  border: 1px solid var(--eduling-border);
+  background: white;
+  margin: 0;
+}
+.eduling-chatbot button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.eduling-chatbot button:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+.eduling-chatbot :focus-visible {
+  outline: 3px solid var(--eduling-action);
+  outline-offset: 2px;
+}
+.eduling-chatbot img {
+  display: block;
+  flex-shrink: 0;
+}
+.eduling-chatbot p,
+.eduling-chatbot h1,
+.eduling-chatbot h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.eduling-chatbot small {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--eduling-muted);
+}
+.eduling-chatbot .eduling-launcher {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--eduling-action);
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px #183e4814;
+}
+.eduling-panel {
+  display: flex;
+  flex-direction: column;
+  width: 420px;
+  height: min(820px, calc(100dvh - 48px));
+  background: white;
+  border: 1px solid var(--eduling-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 70px #183e4826;
+}
+.eduling-expanded {
+  position: fixed;
+  inset: 16px;
+  width: auto;
+  height: auto;
+}
+.eduling-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 16px;
+  min-height: 84px;
+}
+.eduling-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--eduling-brand);
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+.eduling-identity {
+  flex: 1;
+  min-width: 0;
+}
+.eduling-identity strong {
+  font-size: 14px;
+  line-height: 20px;
+  display: block;
+}
+.eduling-identity small {
+  font-size: 11px;
+  line-height: 16px;
+  display: block;
+}
+.eduling-chatbot .eduling-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 0;
+  border-radius: 8px;
+  min-height: 36px;
+  min-width: 32px;
+}
+.eduling-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+}
+.eduling-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.eduling-welcome > .eduling-avatar {
+  width: 48px;
+}
+.eduling-welcome h1 {
+  white-space: pre-line;
+  font-size: 28px;
+  line-height: 41px;
+  font-weight: 700;
+}
+.eduling-welcome p {
+  color: var(--eduling-muted);
+}
+.eduling-actions {
+  display: grid;
+  gap: 10px;
+}
+.eduling-chatbot .eduling-actions button {
+  background: var(--eduling-surface);
+  border-radius: 16px;
+  min-height: 72px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+.eduling-actions button span {
+  display: grid;
+  gap: 2px;
+}
+.eduling-actions strong {
+  font-size: 14px;
+  line-height: 20px;
+}
+.eduling-message {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.eduling-user {
+  background: #e4f5fa;
+  border-radius: 16px;
+  padding: 16px;
+}
+.eduling-assistant {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.eduling-assistant small {
+  color: var(--eduling-action);
+}
+.eduling-message p {
+  white-space: pre-wrap;
+}
+.eduling-reply,
+.eduling-reply-link,
+.eduling-download-card {
+  align-self: stretch;
+  min-width: 0;
+}
+.eduling-reply {
+  display: grid;
+  gap: 10px;
+  overflow-wrap: anywhere;
+}
+.eduling-chatbot .eduling-email-link {
+  color: var(--eduling-action);
+  text-underline-offset: 2px;
+}
+.eduling-reply ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-inline-start: 1.35em;
+  list-style: disc outside;
+}
+.eduling-chatbot .eduling-subscription {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--eduling-action);
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+.eduling-chatbot .eduling-subscription:hover {
+  filter: brightness(0.9);
+}
+.eduling-download-card {
+  padding: 12px;
+  border: 1px solid var(--eduling-border);
+  border-radius: 14px;
+  background: var(--eduling-surface);
+}
+.eduling-download-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.eduling-download-heading img {
+  flex: none;
+  border-radius: 9px;
+}
+.eduling-downloads {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.eduling-store-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.eduling-store-badge img {
+  width: auto;
+  height: 40px;
+}
+.eduling-download_android img {
+  height: 60px;
+}
+.eduling-store-fallback {
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--eduling-ink);
+  color: white;
+  font-size: 12px;
+  text-decoration: none;
+}
+.eduling-course {
+  border: 1px solid var(--eduling-border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.eduling-course-visual {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #dcf4f2;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--eduling-action);
+}
+.eduling-course h2 {
+  font-size: 20px;
+  line-height: 29px;
+}
+.eduling-course p {
+  color: var(--eduling-muted);
+}
+.eduling-course a {
+  display: block;
+  text-decoration: none;
+  color: white;
+  background: var(--eduling-action);
+  padding: 12px;
+  border-radius: 12px;
+}
+.eduling-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.eduling-chatbot .eduling-suggestions button {
+  padding: 12px;
+  border-radius: 99px;
+  font-size: 12px;
+}
+.eduling-footer {
+  padding: 20px;
+  flex-shrink: 0;
+}
+.eduling-footer form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--eduling-border);
+  border-radius: 16px;
+  padding: 12px;
+}
+.eduling-footer textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  min-height: 34px;
+  max-height: 122px;
+  overflow-y: auto;
+  border: 0;
+  background: white;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 6px 0;
+}
+.eduling-chatbot .eduling-footer textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+.eduling-footer textarea::placeholder {
+  color: var(--eduling-muted);
+  opacity: 1;
+}
+.eduling-chatbot .eduling-send {
+  align-self: flex-end;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--eduling-action);
+  border: 0;
+  border-radius: 12px;
+  min-width: 36px;
+  height: 36px;
+  padding: 4px;
+}
+.eduling-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+.eduling-meta small {
+  font-size: 10px;
+  line-height: 16px;
+}
+.eduling-chatbot .eduling-meta button {
+  border: 0;
+  color: var(--eduling-action);
+  font-size: 11px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.eduling-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 480px) {
+  .eduling-chatbot {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .eduling-panel,
+  .eduling-expanded {
+    position: fixed;
+    inset: 8px;
+    width: auto;
+    height: calc(100dvh - 16px);
+    border-radius: 16px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .eduling-header {
+    padding: 12px;
+    gap: 4px;
+  }
+  .eduling-identity small {
+    font-size: 10px;
+  }
+  .eduling-messages {
+    padding: 16px;
+  }
+  .eduling-welcome h1 {
+    font-size: 25px;
+    line-height: 35px;
+  }
+  .eduling-chatbot .eduling-actions button {
+    padding: 12px;
+  }
+  .eduling-footer {
+    padding: 12px;
+  }
+  .eduling-footer textarea {
+    font-size: 16px;
+  }
+  .eduling-meta {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eduling-chatbot * {
+    scroll-behavior: auto !important;
+  }
+}
+
+.eduling-welcome + [role="log"]:not(:empty) {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--eduling-border);
+}
+
+.eduling-support {
+  padding: 16px;
+  background: var(--eduling-surface);
+  border-radius: 16px;
+}
+.eduling-support > p {
+  margin-bottom: 16px;
+}
+.eduling-support form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.eduling-chatbot .eduling-support input,
+.eduling-chatbot .eduling-support textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid var(--eduling-action);
+  border-radius: 4px 4px 0 0;
+  background: white;
+  padding: 10px 8px;
+  font: inherit;
+  color: var(--eduling-ink);
+}
+.eduling-support textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.eduling-support input::placeholder,
+.eduling-support textarea::placeholder {
+  color: var(--eduling-ink);
+  opacity: 1;
+}
+.eduling-chatbot .eduling-support button {
+  background: var(--eduling-action);
+  color: white;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .eduling-chatbot .eduling-support input,
+  .eduling-chatbot .eduling-support textarea {
+    font-size: 16px;
+  }
+}

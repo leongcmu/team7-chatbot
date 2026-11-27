@@ -4,7 +4,7 @@
 A lightweight Gemini/LangChain **tool-calling agent** with six client-specific tools, deterministic commercial actions, curated Eduling content, and a FastAPI contract for the team's frontend. Built from the team's midpoint notebook. This is a **prototype**, not a security-audited production deployment.
 
 ## Architecture
-`HTML/CSS/JS → POST /chat → multilingual input guard → local embedding search → bounded approved evidence → Gemini agent ↔ six tools → evidence checks → verified actions → JSON`.
+`React → POST /chat → multilingual input guard → local embedding search → bounded approved evidence → Gemini agent ↔ six tools → evidence checks → verified actions → JSON`.
 
 The backend converts approved FAQ/course/article text and each visitor question
 into normalized MiniLM embedding vectors, then ranks records by cosine similarity.
@@ -40,7 +40,23 @@ pytest -q
 uvicorn backend.main:app --reload
 ```
 
-API docs: http://127.0.0.1:8000/docs . Frontend: from `frontend/`, run `python -m http.server 5500`, then open http://localhost:5500 .
+With FastAPI running, open another terminal from the repository root and run
+the React frontend with Node 22.12+ and pnpm 11.25.0.
+
+```bash
+cd frontend/react
+pnpm install --frozen-lockfile
+pnpm build
+pnpm dev
+```
+
+Open the URL printed by Vite, typically http://127.0.0.1:5173. Vite proxies
+`/api/chat` to FastAPI at http://127.0.0.1:8000/chat. FastAPI docs are at
+http://127.0.0.1:8000/docs. For deployment, route `/api/*` to FastAPI with the
+`/api` prefix stripped, or set `VITE_CHAT_API_BASE_URL` before building and
+add the frontend origin to FastAPI's `ALLOWED_ORIGINS`.
+
+The original static demo is also available via `python -m http.server 5500 --directory frontend`.
 
 ## Knowledge-base records
 
