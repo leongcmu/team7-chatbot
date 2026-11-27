@@ -1,5 +1,9 @@
 """Deterministic tests for backend-controlled evidence retrieval."""
-from backend.evidence import MAX_CONTEXT_RECORDS, retrieve_evidence
+from backend.evidence import (
+    MAX_CONTEXT_RECORDS,
+    retrieve_evidence,
+    select_prior_context_evidence,
+)
 from backend import evidence
 from backend.embeddings import EmbeddingHit
 
@@ -74,3 +78,19 @@ def test_embedding_hits_are_resolved_to_approved_evidence(monkeypatch):
     assert bundle.retrieval_mode=='embedding'
     assert bundle.records[0]['id']=='tests_ielts_toefl'
     assert bundle.records[0]['score']==0.81
+
+
+def test_pronoun_followup_reuses_latest_prior_factual_record_only():
+    older={'id':'company_what_is_eduling','kind':'faq','status':'approved'}
+    latest={'id':'tests_ielts_toefl','kind':'faq','status':'approved'}
+    commercial={'id':'commercial_app_downloads','kind':'commercial','status':'approved'}
+    selected=select_prior_context_evidence(
+        'What skills do they cover?',
+        [older,latest,commercial],
+    )
+    assert [item['id'] for item in selected]==['tests_ielts_toefl']
+
+
+def test_unrelated_new_question_does_not_reuse_stale_prior_evidence():
+    prior={'id':'tests_ielts_toefl','kind':'faq','status':'approved'}
+    assert select_prior_context_evidence('Who won the World Cup?',[prior])==[]

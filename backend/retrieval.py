@@ -20,6 +20,11 @@ TOPIC_WEIGHTS = {
     'pronunciation': 2.5,
     'vocabulary': 2.5,
 }
+SEARCH_GENERIC_WORDS={
+    'a','about','an','and','are','can','do','does','eduling','for','how','i','in',
+    'is','it','me','of','on','or','please','tell','the','to','what','when','where',
+    'whether','which','who','why','with','you','your',
+}
 AVAILABILITY_WORDS={'offer','provide','available','availability','have','has','practice'}
 COURSE_GENERIC_WORDS={
     'a','an','and','are','can','course','do','does','eduling','for','i','in','is','it',
@@ -90,6 +95,7 @@ def filter_course_availability(query: str, matches: list[dict]) -> list[dict]:
 def search(query: str, items: list[dict], *, kind: str, limit: int=3,
            min_score: float=0.30, source: str | None=None) -> list[dict]:
     matches=[]
+    meaningful_query=set(normalize(query).split())-SEARCH_GENERIC_WORDS
     query_topics=set(normalize(query).split()) & TOPIC_WEIGHTS.keys()
     for item in items:
         if not approved(item): continue
@@ -97,6 +103,11 @@ def search(query: str, items: list[dict], *, kind: str, limit: int=3,
                    item.get('summary',''),item.get('description',''),item.get('content',''),
                    item.get('answer','')]
         phrases += item.get('alternate_phrasings',[]) + item.get('topics',[])
+        candidate_terms=set(normalize(' '.join(
+            phrase for phrase in phrases if isinstance(phrase,str)
+        )).split())
+        if meaningful_query and not meaningful_query & candidate_terms:
+            continue
         scored_phrases=[(similarity(query,p),p) for p in phrases if isinstance(p,str)]
         score,matched_text=max(scored_phrases,default=(0,''),key=lambda pair:pair[0])
         if query_topics:

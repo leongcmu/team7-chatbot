@@ -93,6 +93,27 @@ def test_multi_turn_followup_uses_relevant_prior_context_not_prior_tool_calls(mo
     assert '"prior_context_records":["tests_ielts_toefl"]' in diagnostic
 
 
+def test_pronoun_followup_uses_latest_prior_context(monkeypatch,caplog):
+    prior_question='Do you have IELTS courses?'
+    prior_input=retrieve_evidence(prior_question).generation_input(prior_question)
+
+    class HistoryAgent:
+        def invoke(self,payload,config):
+            return {'messages':[
+                HumanMessage(content=prior_input),AIMessage(content='Prior answer'),
+                *payload['messages'],AIMessage(content='They cover IELTS speaking and writing.'),
+            ]}
+
+    monkeypatch.setattr(agent,'get_agent',lambda:HistoryAgent())
+    monkeypatch.setattr(agent,'get_settings',lambda:SimpleNamespace(max_agent_steps=8,diagnostic_logging=True))
+    with caplog.at_level(logging.INFO,logger='backend.agent'):
+        result=agent.chat('What skills do they cover?','visitor_pronoun_followup')
+
+    diagnostic=next(record.message for record in caplog.records if record.message.startswith('chat_diagnostic'))
+    assert result['status']=='answered'
+    assert '"prior_context_records":["tests_ielts_toefl"]' in diagnostic
+
+
 def test_grounded_ielts_answer_succeeds_with_mocked_agent(monkeypatch):
     evidence=search_course_catalog.invoke({'query':'What IELTS speaking courses does Eduling offer?'})
     fake=FakeAgent([_tool_message(evidence), AIMessage(content='Eduling offers IELTS speaking and writing courses and a TOEFL Speaking course.')])
@@ -249,7 +270,7 @@ def test_other_unverified_course_requests_are_not_answered_yes_or_no(monkeypatch
     assert {action['type'] for action in result['actions']}=={'download_ios','download_android'}
 
 
-def test_verified_fact_cannot_ground_an_invented_product_feature(monkeypatch):
+def test_invented_product_feature_recovers_to_curated_answer(monkeypatch):
     evidence=search_course_catalog.invoke({'query':'What IELTS courses are available?'})
     fake=FakeAgent([
         _tool_message(evidence),
@@ -259,8 +280,9 @@ def test_verified_fact_cannot_ground_an_invented_product_feature(monkeypatch):
 
     result=agent.chat('What IELTS courses are available?','visitor_test_product_claim')
 
-    assert result['status']=='fallback'
+    assert result['status']=='answered'
     assert 'virtual reality' not in result['answer'].lower()
+    assert 'IELTS speaking and writing' in result['answer']
 
 
 def test_no_evidence_cannot_ground_fabricated_answer(monkeypatch):

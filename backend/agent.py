@@ -24,7 +24,13 @@ from .guardrails import (
 from .actions import select_actions
 from .knowledge_base import records, commercial
 from .retrieval import course_availability_state, search
-from .evidence import EvidenceBundle, merge_evidence, retrieve_evidence, select_relevant_evidence
+from .evidence import (
+    EvidenceBundle,
+    merge_evidence,
+    retrieve_evidence,
+    select_prior_context_evidence,
+    select_relevant_evidence,
+)
 
 logger=logging.getLogger(__name__)
 
@@ -197,6 +203,15 @@ def _failure_kind(exc: Exception) -> str:
         return 'model_failure'
     return 'agent_orchestration_failure'
 
+
+def _approved_recovery_answer(evidence: list[dict]) -> str:
+    """Return one curated factual answer when model wording alone is rejected."""
+    return next((
+        str(item.get('content','')).strip()
+        for item in evidence
+        if item.get('kind') in {'faq','course','blog'} and str(item.get('content','')).strip()
+    ),'')
+
 def chat(message: str, session_id: str) -> dict:
     """Run the guarded agent and assemble a frontend-safe result."""
     started=perf_counter()
@@ -225,7 +240,7 @@ def chat(message: str, session_id: str) -> dict:
         current_turn=_current_turn_messages(messages,input_content)
         prior_messages=messages[:len(messages)-len(current_turn)]
         tool_evidence=select_relevant_evidence(message,_evidence_from_messages(current_turn))
-        prior_evidence=select_relevant_evidence(
+        prior_evidence=select_prior_context_evidence(
             message,_evidence_from_wrapped_inputs(prior_messages),
         )
         evidence=merge_evidence(pre_retrieved.records,prior_evidence,tool_evidence)
@@ -257,6 +272,20 @@ def chat(message: str, session_id: str) -> dict:
             problems.append('no_evidence')
         if failed_tools:
             problems.append('tool_failure')
+        # If the only problem is loose model wording, discard it and use the
+        # approved record itself. Strict price, URL, named-course, availability,
+        # commercial, and tool-failure checks never enter this recovery path.
+        if set(problems)=={'unsupported_product_claim'}:
+            recovered=_approved_recovery_answer(evidence)
+            recovery_problems=(
+                answer_checks(recovered)
+                + availability_claim_checks(recovered,availability)
+                + commercial_claim_checks(recovered,evidence)
+                + evidence_checks(recovered,evidence)
+            ) if recovered else ['no_recovery_answer']
+            if not recovery_problems:
+                answer=recovered
+                problems=[]
         if problems:
             unique_problems=list(dict.fromkeys(problems))
             reason=(ReasonCode.NO_EVIDENCE

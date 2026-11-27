@@ -21,6 +21,7 @@ GENERIC_QUERY_WORDS={
 }
 BLOG_WORDS={'article','articles','blog','blogs','news','post','posts'}
 PRICE_COMPARISON_WORDS={'cheaper','lower','less','saving','savings','versus','vs'}
+REFERENTIAL_WORDS={'it','its','they','them','their','theirs','these','those'}
 logger=logging.getLogger(__name__)
 
 
@@ -95,6 +96,26 @@ def select_relevant_evidence(question: str, candidates: list[dict]) -> list[dict
         elif item.get('id')=='commercial_support':
             commercial_records.append(item)
     return _select_specific(question,factual_records)+commercial_records
+
+
+def select_prior_context_evidence(question: str, candidates: list[dict]) -> list[dict]:
+    """Reuse the latest factual record for an explicit pronoun follow-up.
+
+    Direct question-specific matches always win. The fallback is deliberately
+    limited to referential wording so an unrelated new question cannot inherit
+    stale product evidence from an older turn.
+    """
+    selected=select_relevant_evidence(question,candidates)
+    if any(item.get('kind')!='commercial' for item in selected):
+        return selected
+    words=set(normalize(question).split())
+    if not words & REFERENTIAL_WORDS:
+        return selected
+    latest_factual=next(
+        (item for item in reversed(candidates) if item.get('kind')!='commercial'),
+        None,
+    )
+    return ([latest_factual] if latest_factual else [])+selected
 
 
 def app_evidence(reason: str='course_discovery') -> dict:
