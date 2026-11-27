@@ -1,0 +1,408 @@
+{
+  "mode": "embedding search",
+  "passed": 52,
+  "total": 52,
+  "accuracy": 1.0,
+  "rows": [
+    {
+      "question": "What is Eduling?",
+      "expected": "company_what_is_eduling",
+      "actual": [
+        "company_what_is_eduling"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Could you explain what Eduling does?",
+      "expected": "company_what_is_eduling",
+      "actual": [
+        "company_what_is_eduling"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What kind of service is this?",
+      "expected": "company_what_is_eduling",
+      "actual": [
+        "company_what_is_eduling"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Tell me what your learning platform is about.",
+      "expected": "company_what_is_eduling",
+      "actual": [
+        "company_what_is_eduling"
+      ],
+      "passed": true
+    },
+    {
+      "question": "When was Eduling created?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "When did the company begin?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "How old is Eduling?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "What year did Eduling launch?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "Who benefits from Eduling?",
+      "expected": "audience_who_benefits",
+      "actual": [
+        "audience_who_benefits"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Who is the platform designed for?",
+      "expected": "audience_who_benefits",
+      "actual": [
+        "audience_who_benefits"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Would this work for teachers as well as learners?",
+      "expected": "audience_who_benefits",
+      "actual": [
+        "audience_who_benefits"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What kinds of people use Eduling?",
+      "expected": "audience_who_benefits",
+      "actual": [
+        "audience_who_benefits"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Why should I use Eduling?",
+      "expected": "benefits_why_use",
+      "actual": [
+        "benefits_why_use"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What makes this different from memorization apps?",
+      "expected": "benefits_why_use",
+      "actual": [
+        "benefits_why_use"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What are the main benefits?",
+      "expected": "benefits_why_use",
+      "actual": [
+        "benefits_why_use"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Why would a learner choose your platform?",
+      "expected": "benefits_why_use",
+      "actual": [
+        "benefits_why_use"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How is AI used to help me learn?",
+      "expected": "features_ai_learning",
+      "actual": [
+        "features_ai_learning"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can the tutor correct my speaking?",
+      "expected": "features_ai_learning",
+      "actual": [
+        "features_ai_learning"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Will I get automated feedback on writing?",
+      "expected": "features_ai_learning",
+      "actual": [
+        "features_ai_learning"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How does EdulingAI support practice?",
+      "expected": "features_ai_learning",
+      "actual": [
+        "features_ai_learning"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Is Eduling free and how much does premium cost?",
+      "expected": "pricing_premium",
+      "actual": [
+        "pricing_premium"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What is the current premium price?",
+      "expected": "pricing_premium",
+      "actual": [
+        "pricing_premium"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How much would a one-year plan be?",
+      "expected": "pricing_premium",
+      "actual": [
+        "pricing_premium"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Tell me what the paid version costs.",
+      "expected": "pricing_premium",
+      "actual": [
+        "pricing_premium"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can I use Eduling with my class or school?",
+      "expected": "educators_dashboard",
+      "actual": [
+        "educators_dashboard"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can teachers assign work to students?",
+      "expected": "educators_dashboard",
+      "actual": [
+        "educators_dashboard"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Do you offer classroom management tools?",
+      "expected": "educators_dashboard",
+      "actual": [
+        "educators_dashboard"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Is there a dashboard for educators?",
+      "expected": "educators_dashboard",
+      "actual": [
+        "educators_dashboard"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How can I contact the Eduling team?",
+      "expected": "support_contact",
+      "actual": [
+        "support_contact"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can I talk to a real person?",
+      "expected": "support_contact",
+      "actual": [
+        "support_contact"
+      ],
+      "passed": true
+    },
+    {
+      "question": "I need help from a human.",
+      "expected": "support_contact",
+      "actual": [
+        "support_contact"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Where can I reach customer support?",
+      "expected": "support_contact",
+      "actual": [
+        "support_contact"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can Eduling help me prepare for IELTS or TOEFL?",
+      "expected": "tests_ielts_toefl",
+      "actual": [
+        "tests_ielts_toefl"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Do you have IELTS prep?",
+      "expected": "tests_ielts_toefl",
+      "actual": [
+        "tests_ielts_toefl"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Is there a TOEFL course?",
+      "expected": "tests_ielts_toefl",
+      "actual": [
+        "tests_ielts_toefl"
+      ],
+      "passed": true
+    },
+    {
+      "question": "I want practice for an English proficiency exam.",
+      "expected": "tests_ielts_toefl",
+      "actual": [
+        "tests_ielts_toefl"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How do I get started and is there a mobile app?",
+      "expected": "getting_started_apps",
+      "actual": [
+        "getting_started_apps"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Where can I download Eduling?",
+      "expected": "getting_started_apps",
+      "actual": [
+        "getting_started_apps"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How do I make an account?",
+      "expected": "getting_started_apps",
+      "actual": [
+        "getting_started_apps"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Can I install this on my phone?",
+      "expected": "getting_started_apps",
+      "actual": [
+        "getting_started_apps"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How can I learn more about Eduling on social media?",
+      "expected": "social_media",
+      "actual": [
+        "social_media"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Where can I follow you online?",
+      "expected": "social_media",
+      "actual": [
+        "social_media"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Are you on Instagram or LinkedIn?",
+      "expected": "social_media",
+      "actual": [
+        "social_media"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Which social networks does Eduling use?",
+      "expected": "social_media",
+      "actual": [
+        "social_media"
+      ],
+      "passed": true
+    },
+    {
+      "question": "What courses are offered?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "Give me the complete course catalog.",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "How many languages can I learn?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "What subjects can I study?",
+      "expected": null,
+      "actual": [],
+      "passed": true
+    },
+    {
+      "question": "What is the difference between the courses?",
+      "expected": "course_differences",
+      "actual": [
+        "course_differences"
+      ],
+      "passed": true
+    },
+    {
+      "question": "How do general English and test prep differ?",
+      "expected": "course_differences",
+      "actual": [
+        "course_differences"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Which type of course should I choose?",
+      "expected": "course_differences",
+      "actual": [
+        "course_differences"
+      ],
+      "passed": true
+    },
+    {
+      "question": "Explain your different learning tracks.",
+      "expected": "course_differences",
+      "actual": [
+        "course_differences"
+      ],
+      "passed": true
+    }
+  ]
+}

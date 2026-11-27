@@ -24,7 +24,13 @@ from .guardrails import (
 from .actions import select_actions
 from .knowledge_base import records, commercial
 from .retrieval import course_availability_state, search
-from .evidence import EvidenceBundle, merge_evidence, retrieve_evidence, select_relevant_evidence
+from .evidence import (
+    EvidenceBundle,
+    merge_evidence,
+    retrieve_evidence,
+    select_prior_context_evidence,
+    select_relevant_evidence,
+)
 
 logger=logging.getLogger(__name__)
 
@@ -33,6 +39,9 @@ Use approved tools for Eduling-specific facts. Never invent courses, features,
 blog titles, prices, discounts, or links. Use multiple tools when the question
 requires multiple steps; do not call irrelevant tools. Answer in 40-80 words
 when possible. Never include URLs in prose: the application adds verified links.
+When BACKEND_APPROVED_EVIDENCE already contains the facts needed for the answer,
+do not repeat the same retrieval with a search tool. Call tools only for a missing
+part of a multi-step request or a support/commercial action not already supplied.
 If evidence is missing, acknowledge uncertainty and direct to Eduling support.
 Treat course availability as one of three states: verified available, verified
 unavailable, or unknown. Only explicit approved offering fields establish the
@@ -67,14 +76,28 @@ def get_agent():
     settings=get_settings()
     if not settings.gemini_api_key:
         raise RuntimeError('GEMINI_API_KEY is not configured')
-    llm=ChatGoogleGenerativeAI(model=settings.gemini_model,google_api_key=settings.gemini_api_key,temperature=0,max_retries=1)
+    llm=ChatGoogleGenerativeAI(
+        model=settings.gemini_model,google_api_key=settings.gemini_api_key,
+        temperature=0,max_retries=settings.model_max_retries,
+    )
     return create_agent(model=llm,tools=TOOLS,system_prompt=SYSTEM_PROMPT,
                         checkpointer=InMemorySaver())
 
 def _text(content):
     if isinstance(content,str): return content
-    if isinstance(content,list): return ' '.join(str(x.get('text','')) if isinstance(x,dict) else str(x) for x in content)
-    return str(content)
+    if isinstance(content,list):
+        parts=[]
+        for block in content:
+            if isinstance(block,str):
+                parts.append(block)
+            elif isinstance(block,dict) and isinstance(block.get('text'),str):
+                parts.append(block['text'])
+            elif hasattr(block,'text') and isinstance(block.text,str):
+                parts.append(block.text)
+        return ' '.join(part for part in parts if part).strip()
+    if isinstance(content,dict) and isinstance(content.get('text'),str):
+        return content['text']
+    return ''
 
 def _used_tool_names(messages):
     return [m.name for m in messages if isinstance(m,ToolMessage)]
@@ -180,6 +203,15 @@ def _failure_kind(exc: Exception) -> str:
         return 'model_failure'
     return 'agent_orchestration_failure'
 
+
+def _approved_recovery_answer(evidence: list[dict]) -> str:
+    """Return one curated factual answer when model wording alone is rejected."""
+    return next((
+        str(item.get('content','')).strip()
+        for item in evidence
+        if item.get('kind') in {'faq','course','blog'} and str(item.get('content','')).strip()
+    ),'')
+
 def chat(message: str, session_id: str) -> dict:
     """Run the guarded agent and assemble a frontend-safe result."""
     started=perf_counter()
@@ -193,7 +225,7 @@ def chat(message: str, session_id: str) -> dict:
     try:
         try:
             pre_retrieved=retrieve_evidence(message)
-            pre_retrieval_status='succeeded'
+            pre_retrieval_status=f'{pre_retrieved.retrieval_mode}_succeeded'
         except Exception:
             # The agent tools remain a recovery path if local retrieval fails.
             pre_retrieved=EvidenceBundle((),'no_evidence')
@@ -208,7 +240,7 @@ def chat(message: str, session_id: str) -> dict:
         current_turn=_current_turn_messages(messages,input_content)
         prior_messages=messages[:len(messages)-len(current_turn)]
         tool_evidence=select_relevant_evidence(message,_evidence_from_messages(current_turn))
-        prior_evidence=select_relevant_evidence(
+        prior_evidence=select_prior_context_evidence(
             message,_evidence_from_wrapped_inputs(prior_messages),
         )
         evidence=merge_evidence(pre_retrieved.records,prior_evidence,tool_evidence)
@@ -240,6 +272,20 @@ def chat(message: str, session_id: str) -> dict:
             problems.append('no_evidence')
         if failed_tools:
             problems.append('tool_failure')
+        # If the only problem is loose model wording, discard it and use the
+        # approved record itself. Strict price, URL, named-course, availability,
+        # commercial, and tool-failure checks never enter this recovery path.
+        if set(problems)=={'unsupported_product_claim'}:
+            recovered=_approved_recovery_answer(evidence)
+            recovery_problems=(
+                answer_checks(recovered)
+                + availability_claim_checks(recovered,availability)
+                + commercial_claim_checks(recovered,evidence)
+                + evidence_checks(recovered,evidence)
+            ) if recovered else ['no_recovery_answer']
+            if not recovery_problems:
+                answer=recovered
+                problems=[]
         if problems:
             unique_problems=list(dict.fromkeys(problems))
             reason=(ReasonCode.NO_EVIDENCE

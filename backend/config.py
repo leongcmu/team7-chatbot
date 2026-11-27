@@ -12,6 +12,9 @@ class Settings:
     gemini_model: str
     allowed_origins: tuple[str, ...]
     max_agent_steps: int
+    model_max_retries: int
+    embedding_model: str
+    embedding_min_score: float
     diagnostic_logging: bool
 
 @lru_cache
@@ -25,8 +28,13 @@ def get_settings() -> Settings:
         pass
     return Settings(
         gemini_api_key=os.getenv('GEMINI_API_KEY', ''),
-        gemini_model=os.getenv('GEMINI_MODEL', 'gemini-2.5-flash'),
+        gemini_model=os.getenv('GEMINI_MODEL', 'gemini-3.8-flash'),
         allowed_origins=tuple(x.strip() for x in os.getenv('ALLOWED_ORIGINS','http://localhost:5500,http://127.0.0.1:5500').split(',') if x.strip()),
-        max_agent_steps=int(os.getenv('MAX_AGENT_STEPS','8')),
+        max_agent_steps=int(os.getenv('MAX_AGENT_STEPS','4')),
+        model_max_retries=int(os.getenv('MODEL_MAX_RETRIES','2')),
+        embedding_model=os.getenv(
+            'EMBEDDING_MODEL','sentence-transformers/all-MiniLM-L6-v2',
+        ),
+        embedding_min_score=float(os.getenv('EMBEDDING_MIN_SCORE','0.27')),
         diagnostic_logging=os.getenv('DIAGNOSTIC_LOGGING','false').lower() in {'1','true','yes','on'},
     )
